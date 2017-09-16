@@ -1,7 +1,12 @@
 package ru.javaops.masterjava.matrix;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -11,91 +16,7 @@ import java.util.stream.IntStream;
  */
 public class MatrixUtil {
 
-    public static int[][] concurrentMultiply(int[][] matrixA, int[][] matrixB, ExecutorService executor) throws InterruptedException, ExecutionException {
-        final int matrixSize = matrixA.length;
-        final int[][] matrixC = new int[matrixSize][matrixSize];
-
-        class ColumnMultipleResult {
-            private final int col;
-            private final int[] columnC;
-
-            private ColumnMultipleResult(int col, int[] columnC) {
-                this.col = col;
-                this.columnC = columnC;
-            }
-        }
-
-        final CompletionService<ColumnMultipleResult> completionService = new ExecutorCompletionService<>(executor);
-
-        for (int j = 0; j < matrixSize; j++) {
-            final int col = j;
-            final int[] columnB = new int[matrixSize];
-            for (int k = 0; k < matrixSize; k++) {
-                columnB[k] = matrixB[k][col];
-            }
-            completionService.submit(() -> {
-                final int[] columnC = new int[matrixSize];
-
-                for (int row = 0; row < matrixSize; row++) {
-                    final int[] rowA = matrixA[row];
-                    int sum = 0;
-                    for (int k = 0; k < matrixSize; k++) {
-                        sum += rowA[k] * columnB[k];
-                    }
-                    columnC[row] = sum;
-                }
-                return new ColumnMultipleResult(col, columnC);
-            });
-        }
-
-        for (int i = 0; i < matrixSize; i++) {
-            ColumnMultipleResult res = completionService.take().get();
-            for (int k = 0; k < matrixSize; k++) {
-                matrixC[k][res.col] = res.columnC[k];
-            }
-        }
-        return matrixC;
-    }
-
-    public static int[][] concurrentMultiplyCayman(int[][] matrixA, int[][] matrixB, ExecutorService executor) throws InterruptedException, ExecutionException {
-        final int matrixSize = matrixA.length;
-        final int[][] matrixResult = new int[matrixSize][matrixSize];
-        final int threadCount = Runtime.getRuntime().availableProcessors();
-        final int maxIndex = matrixSize * matrixSize;
-        final int cellsInThread = maxIndex / threadCount;
-        final int[][] matrixBFinal = new int[matrixSize][matrixSize];
-
-        for (int i = 0; i < matrixSize; i++) {
-            for (int j = 0; j < matrixSize; j++) {
-                matrixBFinal[i][j] = matrixB[j][i];
-            }
-        }
-
-        Set<Callable<Boolean>> threads = new HashSet<>();
-        int fromIndex = 0;
-        for (int i = 1; i <= threadCount; i++) {
-            final int toIndex = i == threadCount ? maxIndex : fromIndex + cellsInThread;
-            final int firstIndexFinal = fromIndex;
-            threads.add(() -> {
-                for (int j = firstIndexFinal; j < toIndex; j++) {
-                    final int row = j / matrixSize;
-                    final int col = j % matrixSize;
-
-                    int sum = 0;
-                    for (int k = 0; k < matrixSize; k++) {
-                        sum += matrixA[row][k] * matrixBFinal[col][k];
-                    }
-                    matrixResult[row][col] = sum;
-                }
-                return true;
-            });
-            fromIndex = toIndex;
-        }
-        executor.invokeAll(threads);
-        return matrixResult;
-    }
-
-    public static int[][] concurrentMultiplyDarthVader(int[][] matrixA, int[][] matrixB, ExecutorService executor)
+    public static int[][] concurrentMultiplyStreams(int[][] matrixA, int[][] matrixB, ExecutorService executor)
             throws InterruptedException, ExecutionException {
 
         final int matrixSize = matrixA.length;
@@ -161,7 +82,30 @@ public class MatrixUtil {
         return matrixC;
     }
 
-    // Optimized by https://habrahabr.ru/post/114797/
+    public static int[][] concurrentMultiply3(int[][] matrixA, int[][] matrixB, ExecutorService executor) throws InterruptedException {
+        final int matrixSize = matrixA.length;
+        final int[][] matrixC = new int[matrixSize][matrixSize];
+        final CountDownLatch latch = new CountDownLatch(matrixSize);
+
+        for (int row = 0; row < matrixSize; row++) {
+            final int[] rowA = matrixA[row];
+            final int[] rowC = matrixC[row];
+
+            executor.submit(() -> {
+                for (int idx = 0; idx < matrixSize; idx++) {
+                    final int elA = rowA[idx];
+                    final int[] rowB = matrixB[idx];
+                    for (int col = 0; col < matrixSize; col++) {
+                        rowC[col] += elA * rowB[col];
+                    }
+                }
+                latch.countDown();
+            });
+        }
+        latch.await();
+        return matrixC;
+    }
+
     public static int[][] singleThreadMultiplyOpt(int[][] matrixA, int[][] matrixB) {
         final int matrixSize = matrixA.length;
         final int[][] matrixC = new int[matrixSize][matrixSize];
