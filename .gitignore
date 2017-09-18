@@ -1,6 +1,7 @@
-.idea
-out
-target
+/.idea
+/out
+/target
 *.iml
 log
 *.patch
+/doc
