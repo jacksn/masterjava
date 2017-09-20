@@ -33,7 +33,7 @@ public class MainXml {
 
     public static void main(String[] args) throws Exception {
         if (args.length != 1) {
-            System.out.println("Format: projectName");
+            System.out.println("Required argument: projectName");
             System.exit(1);
         }
         String projectName = args[0];
@@ -78,20 +78,15 @@ public class MainXml {
             StaxStreamProcessor processor = new StaxStreamProcessor(is);
             final Set<String> groupNames = new HashSet<>();
 
-            // Projects loop
-            projects:
-            while (processor.doUntil(XMLEvent.START_ELEMENT, "Project")) {
+            while (processor.startElement("Project", "Projects")) {
                 if (projectName.equals(processor.getAttribute("name"))) {
-                    // Groups loop
-                    String element;
-                    while ((element = processor.doUntilAny(XMLEvent.START_ELEMENT, "Project", "Group", "Users")) != null) {
-                        if (!element.equals("Group")) {
-                            break projects;
-                        }
+                    while (processor.startElement("Group", "Project")) {
                         groupNames.add(processor.getAttribute("name"));
                     }
+                    break;
                 }
             }
+
             if (groupNames.isEmpty()) {
                 throw new IllegalArgumentException("Invalid " + projectName + " or no groups");
             }
@@ -99,7 +94,7 @@ public class MainXml {
             // Users loop
             Set<User> users = new TreeSet<>(USER_COMPARATOR);
 
-            while (processor.doUntil(XMLEvent.START_ELEMENT, "User")) {
+            while (processor.startElement("User", null)) {
                 String groupRefs = processor.getAttribute("groupRefs");
                 if (!Collections.disjoint(groupNames, Splitter.on(' ').splitToList(nullToEmpty(groupRefs)))) {
                     User user = new User();
