@@ -1,4 +1,6 @@
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:p="http://javaops.ru">
+
     <xsl:output method="html" omit-xml-declaration="yes" indent="yes"/>
     <xsl:param name="projectName"/>
 
@@ -19,7 +21,7 @@
                         <th>Type</th>
                     </tr>
                     <xsl:for-each
-                            select="/*[name()='Payload']/*[name()='Projects']/*[name()='Project'][@name=$projectName]/*[name()='Group']">
+                            select="/p:Payload/p:Projects/p:Project[@name=$projectName]/p:Group">
                         <tr>
                             <td>
                                 <xsl:value-of select="@name"/>
