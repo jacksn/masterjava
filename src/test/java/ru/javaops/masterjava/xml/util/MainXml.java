@@ -5,7 +5,9 @@ import ru.javaops.masterjava.xml.schema.*;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -13,8 +15,9 @@ public class MainXml {
 
     public static final String XML_SCHEMA_FILE = "payload.xsd";
     public static final String XML_FILE = "payload.xml";
+    public static final String PROJECT_GROUPS_XSLT_FILE = "projectGroups.xsl";
 
-    public static void main(String[] args) throws IOException, JAXBException, XMLStreamException {
+    public static void main(String[] args) throws Exception {
 //        if (args.length < 1) {
 //            return;
 //        }
@@ -27,6 +30,7 @@ public class MainXml {
         users = getUsersWithStax(projectName, XML_FILE);
         users.forEach(user -> System.out.println(user.getFullName() + " [" + user.getEmail() + "]"));
 
+        System.out.println(getProjectGroupsHtml(projectName, XML_FILE, PROJECT_GROUPS_XSLT_FILE));
     }
 
     private static List<User> getUsersWithJaxb(String projectName, String xmlFile, String xmlSchemaFile) throws JAXBException, IOException {
@@ -87,6 +91,15 @@ public class MainXml {
                 }
             }
             return users;
+        }
+    }
+
+    private static String getProjectGroupsHtml(String projectName, String xmlFile, String xsltFile) throws IOException, TransformerException {
+        try (InputStream xslInputStream = Resources.getResource(xsltFile).openStream();
+             InputStream xmlInputStream = Resources.getResource(xmlFile).openStream()) {
+            XsltProcessor processor = new XsltProcessor(xslInputStream);
+            processor.setTransformerAttribute("project", projectName);
+           return processor.transform(xmlInputStream);
         }
     }
 }

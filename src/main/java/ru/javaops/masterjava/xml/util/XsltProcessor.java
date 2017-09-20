@@ -42,6 +42,10 @@ public class XsltProcessor {
         xformer.transform(new StreamSource(sourceReader), new StreamResult(result));
     }
 
+    public void setTransformerAttribute(String name, String value) {
+        xformer.setParameter(name, value);
+    }
+
     public static String getXsltHeader(String xslt) {
         return "<?xml-stylesheet type=\"text/xsl\" href=\"" + xslt + "\"?>\n";
     }
