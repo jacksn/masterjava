@@ -15,13 +15,9 @@ public class StaxStreamProcessorTest {
     public void readCities() throws Exception {
         try (StaxStreamProcessor processor =
                      new StaxStreamProcessor(Resources.getResource("payload.xml").openStream())) {
-            XMLStreamReader reader = processor.getReader();
-            while (reader.hasNext()) {
-                int event = reader.next();
-                if (event == XMLEvent.START_ELEMENT) {
-                    if ("City".equals(reader.getLocalName())) {
-                        System.out.println(reader.getElementText());
-                    }
+            while (processor.readUntilNextElementStart()) {
+                    if ("City".equals(processor.getElementName())) {
+                        System.out.println(processor.getElementText());
                 }
             }
         }
