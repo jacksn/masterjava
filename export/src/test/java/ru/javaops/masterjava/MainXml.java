@@ -13,7 +13,6 @@ import ru.javaops.masterjava.xml.util.Schemas;
 import ru.javaops.masterjava.xml.util.StaxStreamProcessor;
 import ru.javaops.masterjava.xml.util.XsltProcessor;
 
-import javax.xml.stream.events.XMLEvent;
 import java.io.InputStream;
 import java.io.Writer;
 import java.net.URL;
