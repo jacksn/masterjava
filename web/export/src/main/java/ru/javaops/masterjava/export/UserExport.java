@@ -1,7 +1,7 @@
 package ru.javaops.masterjava.export;
 
-import ru.javaops.masterjava.model.User;
-import ru.javaops.masterjava.model.UserFlag;
+import ru.javaops.masterjava.persist.model.User;
+import ru.javaops.masterjava.persist.model.UserFlag;
 import ru.javaops.masterjava.xml.util.StaxStreamProcessor;
 
 import javax.xml.stream.XMLStreamException;
