@@ -9,6 +9,7 @@
     <name>MasterJava Web</name>
 
     <modules>
+        <module>common-web</module>
         <module>export</module>
         <module>webapp</module>
     </modules>
