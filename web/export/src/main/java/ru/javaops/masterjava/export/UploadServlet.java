@@ -1,6 +1,8 @@
 package ru.javaops.masterjava.export;
 
 import org.thymeleaf.context.WebContext;
+import ru.javaops.masterjava.persist.DBIProvider;
+import ru.javaops.masterjava.persist.dao.UserDao;
 import ru.javaops.masterjava.persist.model.User;
 
 import javax.servlet.ServletException;
@@ -19,8 +21,10 @@ import static ru.javaops.masterjava.export.ThymeleafListener.engine;
 @WebServlet("/")
 @MultipartConfig
 public class UploadServlet extends HttpServlet {
+    private static final int DEFAULT_CHUNK_SIZE = 10;
 
     private final UserExport userExport = new UserExport();
+    private final UserDao userDao = DBIProvider.getDao(UserDao.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -37,6 +41,18 @@ public class UploadServlet extends HttpServlet {
             Part filePart = req.getPart("fileToUpload");
             try (InputStream is = filePart.getInputStream()) {
                 List<User> users = userExport.process(is);
+
+                int chunkSize = DEFAULT_CHUNK_SIZE;
+
+                String chunkSizeParam = req.getParameter("chunkSize");
+                try {
+                    chunkSize = Integer.parseInt(chunkSizeParam);
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+
+                userDao.insertAll(users.iterator(), chunkSize);
+
                 webContext.setVariable("users", users);
                 engine.process("result", webContext, resp.getWriter());
             }
@@ -44,5 +60,7 @@ public class UploadServlet extends HttpServlet {
             webContext.setVariable("exception", e);
             engine.process("exception", webContext, resp.getWriter());
         }
+
+
     }
 }

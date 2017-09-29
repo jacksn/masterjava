@@ -26,11 +26,11 @@ public class DBIProvider {
         static {
             final DBI dbi;
             if (connectionFactory != null) {
-                log.info("Init jDBI with  connectionFactory");
+                log.info("Init jDBI with connectionFactory");
                 dbi = new DBI(connectionFactory);
             } else {
                 try {
-                    log.info("Init jDBI with  JNDI");
+                    log.info("Init jDBI with JNDI");
                     InitialContext ctx = new InitialContext();
                     dbi = new DBI((DataSource) ctx.lookup("java:/comp/env/jdbc/masterjava"));
                 } catch (Exception ex) {
