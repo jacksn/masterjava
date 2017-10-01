@@ -1,4 +1,4 @@
-package ru.javaops.masterjava.export;
+package ru.javaops.masterjava.common.web;
 
 import org.thymeleaf.TemplateEngine;
 import ru.javaops.masterjava.common.web.ThymeleafUtil;
