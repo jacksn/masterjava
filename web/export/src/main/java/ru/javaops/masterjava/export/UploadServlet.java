@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.List;
 
 import static ru.javaops.masterjava.export.ThymeleafListener.engine;
@@ -51,7 +52,17 @@ public class UploadServlet extends HttpServlet {
                     e.printStackTrace();
                 }
 
-                userDao.insertAll(users.iterator(), chunkSize);
+                int[] result = userDao.insertAll(users.iterator(), chunkSize);
+
+                int i = 0;
+                Iterator<User> iterator = users.iterator();
+                while (iterator.hasNext()) {
+                    iterator.next();
+                    if (result[i] == 1) {
+                        iterator.remove();
+                    }
+                    i++;
+                }
 
                 webContext.setVariable("users", users);
                 engine.process("result", webContext, resp.getWriter());
@@ -60,7 +71,5 @@ public class UploadServlet extends HttpServlet {
             webContext.setVariable("exception", e);
             engine.process("exception", webContext, resp.getWriter());
         }
-
-
     }
 }
