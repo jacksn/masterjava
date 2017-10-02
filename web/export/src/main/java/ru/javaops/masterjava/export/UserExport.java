@@ -1,8 +1,8 @@
 package ru.javaops.masterjava.export;
 
+import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 import one.util.streamex.StreamEx;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.javaops.masterjava.persist.DBIProvider;
 import ru.javaops.masterjava.persist.dao.UserDao;
 import ru.javaops.masterjava.persist.model.User;
@@ -23,21 +23,17 @@ import java.util.concurrent.Future;
  * gkislin
  * 14.10.2016
  */
+@Slf4j
 public class UserExport {
-    private static final Logger log = LoggerFactory.getLogger(UserExport.class);
 
     private UserDao userDao = DBIProvider.getDao(UserDao.class);
     private static final int NUMBER_THREADS = 4;
     private ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_THREADS);
 
+    @Value
     public static class FailedEmail {
         public String emailOrRange;
         public String reason;
-
-        public FailedEmail(String emailOrRange, String reason) {
-            this.emailOrRange = emailOrRange;
-            this.reason = reason;
-        }
 
         @Override
         public String toString() {
