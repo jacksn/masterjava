@@ -1,5 +1,6 @@
 package ru.javaops.masterjava.export;
 
+import one.util.streamex.IntStreamEx;
 import ru.javaops.masterjava.persist.DBIProvider;
 import ru.javaops.masterjava.persist.dao.UserDao;
 import ru.javaops.masterjava.persist.model.User;
@@ -20,6 +21,12 @@ public class UserExport {
 
     private UserDao userDao = DBIProvider.getDao(UserDao.class);
 
+    /**
+     * @param is        thr payload input stream
+     * @param chunkSize the batch chunk size
+     * @return users, already present in DB
+     * @throws XMLStreamException
+     */
     public List<User> process(final InputStream is, int chunkSize) throws XMLStreamException {
         final StaxStreamProcessor processor = new StaxStreamProcessor(is);
         List<User> users = new ArrayList<>();
@@ -31,7 +38,11 @@ public class UserExport {
             final User user = new User(fullName, email, flag);
             users.add(user);
         }
-        userDao.insertBatch(users, chunkSize);
-        return users;
+
+        int[] result = userDao.insertBatch(users, chunkSize);
+        return IntStreamEx.range(0, users.size())
+                .filter(i -> result[i] == 0)
+                .mapToObj(users::get)
+                .toList();
     }
 }
