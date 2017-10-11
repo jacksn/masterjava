@@ -33,4 +33,11 @@ abstract public class BaseEntity {
     public int hashCode() {
         return id == null ? 0 : id;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "id=" + id +
+                '}';
+    }
 }
