@@ -1,9 +1,6 @@
 package ru.javaops.masterjava.persist.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * gkislin
@@ -11,6 +8,7 @@ import lombok.Setter;
  */
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 abstract public class BaseEntity {
 
     @Getter

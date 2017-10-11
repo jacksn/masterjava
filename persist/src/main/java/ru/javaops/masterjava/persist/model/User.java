@@ -4,9 +4,10 @@ import com.bertoncelj.jdbi.entitymapper.Column;
 import lombok.*;
 
 @Data
-@RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@RequiredArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true)
 public class User extends BaseEntity {
     @Column("full_name")
     private @NonNull String fullName;
