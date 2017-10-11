@@ -10,6 +10,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static ru.javaops.masterjava.persist.CityTestData.CITIES;
 import static ru.javaops.masterjava.persist.CityTestData.CITY_1;
+import static ru.javaops.masterjava.persist.CityTestData.CITY_2;
 
 public class CityDaoTest extends AbstractDaoTest<CityDao> {
 
@@ -32,6 +33,12 @@ public class CityDaoTest extends AbstractDaoTest<CityDao> {
     public void getByIdTest() throws Exception {
         City city = dao.getById(CITY_1.getId());
         assertEquals(CITY_1, city);
+    }
+
+    @Test
+    public void getByCodeTest() throws Exception {
+        City city = dao.getByCode(CITY_2.getCode());
+        assertEquals(CITY_2, city);
     }
 
     @Test

@@ -44,6 +44,9 @@ public abstract class CityDao implements AbstractDao {
     @SqlQuery("SELECT * FROM cities WHERE id=:id ORDER BY name")
     public abstract City getById(@Bind("id") int id);
 
+    @SqlQuery("SELECT * FROM cities WHERE code=:code ORDER BY name")
+    public abstract City getByCode(@Bind("code")String code);
+
     @SqlUpdate("TRUNCATE cities")
     @Override
     public abstract void clean();
@@ -51,4 +54,5 @@ public abstract class CityDao implements AbstractDao {
     @SqlBatch("INSERT INTO cities (id, code, name) VALUES (:id, :code, :name)" +
             "ON CONFLICT DO NOTHING")
     public abstract int[] insertBatch(@BindBean List<City> cities, @BatchChunkSize int chunkSize);
+
 }
