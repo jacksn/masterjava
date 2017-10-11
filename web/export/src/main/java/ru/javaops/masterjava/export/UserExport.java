@@ -70,7 +70,7 @@ public class UserExport {
                     final String email = processor.getAttribute("email");
                     final UserFlag flag = UserFlag.valueOf(processor.getAttribute("flag"));
                     final String fullName = processor.getReader().getElementText();
-                    final User user = new User(id++, fullName, email, flag);
+                    final User user = new User(id++, fullName, email, flag, null);
                     chunk.add(user);
                     if (chunk.size() == chunkSize) {
                         futures.add(submit(chunk));
