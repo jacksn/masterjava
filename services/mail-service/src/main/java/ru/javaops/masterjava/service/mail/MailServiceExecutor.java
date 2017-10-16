@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-public class MailService {
+public class MailServiceExecutor {
     private static final String OK = "OK";
 
     private static final String INTERRUPTED_BY_FAULTS_NUMBER = "+++ Interrupted by faults number";
